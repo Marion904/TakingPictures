@@ -1,0 +1,58 @@
+{
+  "project_info": {
+    "project_number": "624428334539",
+    "firebase_url": "https://takingpictures-60c9d.firebaseio.com",
+    "project_id": "takingpictures-60c9d",
+    "storage_bucket": "takingpictures-60c9d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:624428334539:android:f3671ca0b941d0cf",
+        "android_client_info": {
+          "package_name": "com.example.wilder.myapplicationphotos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "624428334539-bjqd14eshrb5l2jo3st079905jm9rmuj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.wilder.myapplicationphotos",
+            "certificate_hash": "bd3526c21a1acd06bc3d3be25cb65b06b55affe0"
+          }
+        },
+        {
+          "client_id": "624428334539-57baeie07llc680u9m8d893va77hssjm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-Eth8ONNBElhb-NA7ICcO-pqGmT5Wmp8"
+        },
+        {
+          "current_key": "AIzaSyCrwozw5SSRa_BHbE5KIjqBVC4UOImEzpw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "624428334539-57baeie07llc680u9m8d893va77hssjm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

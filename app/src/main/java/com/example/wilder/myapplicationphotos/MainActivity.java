@@ -1,17 +1,33 @@
 package com.example.wilder.myapplicationphotos;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.SyncStateContract;
+import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -20,12 +36,15 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
+    private StorageReference mStorageRef;
     private static final int PICK_PHOTO = 100;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private String sdf = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     ImageView photo;
     Uri imageUri;
     Button click;
     Button album;
+    private Button buttonUpload;
     String mCurrentPhotoPath;
 
 
@@ -35,9 +54,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mStorageRef= FirebaseStorage.getInstance().getReference();
+
         photo = (ImageView) findViewById(R.id.imageView);
         album = (Button) findViewById(R.id.galleryButton);
         click=(Button) findViewById(R.id.cameraButton);
+        buttonUpload=(Button) findViewById(R.id.buttonUpload);
+
+        buttonUpload.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                upLoadFile();
+            }
+        });
 
         album.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,21 +133,19 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == PICK_PHOTO) {
             imageUri = data.getData();
             photo.setImageURI(imageUri);
-            galleryAddPic();
+            //galleryAddPic();
             return;
             }
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
+            imageUri=data.getData();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             photo.setImageBitmap(imageBitmap);
+            //photo.setImageURI(imageUri);
            galleryAddPic();
             return;
         }
-
-        //
-
-
     }
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -142,6 +169,46 @@ public class MainActivity extends AppCompatActivity {
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
     }
+
+    private void upLoadFile(){
+        if(imageUri!=null) {
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Chargement en cours...");
+            progressDialog.show();
+            StorageReference picRef = mStorageRef.child("images/"+sdf+".jpg");
+
+            picRef.putFile(imageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            progressDialog.dismiss();
+                            Toast.makeText(MainActivity.this, "Upload successfull", Toast.LENGTH_LONG);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            progressDialog.dismiss();
+                            Toast.makeText(MainActivity.this, exception.getMessage(), Toast.LENGTH_LONG);
+
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>(){
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                            progressDialog.setMessage("Uploaded :"+(int)progress+"%");
+
+                        }
+
+
+                    });
+        }
+        else{
+            Toast.makeText(MainActivity.this,"Foirage", Toast.LENGTH_SHORT);
+        }
+    }
+
 
 
 }
